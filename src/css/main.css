@@ -1,0 +1,25 @@
+/* 亮色边框卡片 */
+.glowing-card {
+  background: #0a0f1a;          /* 深色背景（和你图里一致） */
+  border-radius: 20px;          /* 圆角 */
+  padding: 30px 30px;           /* 内边距 */
+  
+  /* 👇 关键：亮色边框 */
+  border: 1px solid rgba(21, 57, 57, 0.4);  /* 青色半透明边框 */
+  
+  /* 👇 关键：外发光（光晕感） */
+  box-shadow: 
+    0 0 8px rgba(36, 71, 71, 0.3),    /* 外部光晕 */
+    inset 0 0 0 1px rgba(33, 69, 69, 0.5); /* 内亮边（更精致） */
+  
+  /* 可选：让文字更清晰 */
+  color: #e0e0e0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}
+.transition-transform {
+    transition: transform 0.2s ease;
+}

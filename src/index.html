@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Alpha 交易台</title>
+    <!-- 1. Google Font API: Inter 字体 -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/src/css/main.css">
+
+    <!-- 2. Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
+                    colors: {
+                        'macro-bg': '#0a0c10',
+                        'macro-card': '#0f1119',
+                        'macro-border': '#23262e',
+                        'macro-muted': '#6c7293',
+                        'macro-text': '#eef2ff',
+                        'macro-accent': '#5c7cff',
+                        'macro-hover': '#1a1d27',
+                        'macro-active': '#242936',
+                },
+                borderRadius: {
+                    'xl': '1rem',
+                    '2xl': '1.25rem',
+                }
+            }
+        }
+        }
+    </script>
+
+    <!-- 3. ECharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0a0c10;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #eef2ff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #151a22;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2c3142;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a516e;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 280px;
+        }
+
+        /* 表格滚动优化 */
+        .data-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            min-width: 600px;
+        }
+    </style>
+</head>
+
+<body class="h-screen overflow-hidden">
+
+    <div class="flex h-full w-full">
+
+        <!-- ========= 侧边栏 (两个板块) ========= -->
+        <aside class="w-64 flex-shrink-0 bg-[#0f1117] border-r border-macro-border flex flex-col">
+            <div class="p-5 border-b border-macro-border text-center glowing-card">
+                <!-- <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-[#8b9eff] bg-clip-text text-transparent">
+                    Alpha</h1> -->
+                <img src="/src/img/logo.png" alt="Alpha" class="w-24 mx-auto">
+                <!-- <p class="text-x1 text-macro-muted mt-1">阿尔法交易台</p> -->
+            </div>
+
+            <nav class="flex-1 p-3 space-y-1">
+                <!-- 板块1: 市场总览 (含图表) -->
+                <div id="navDashboard"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-macro-muted hover:bg-macro-hover">
+                    <span>📊</span>
+                    <span class="text-sm font-medium">市场情绪</span>
+                </div>
+                <!-- 板块2: 股票指标看板 (展示 GLW, HON, NBIS 等数据) -->
+                <div id="navStockBoard"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-macro-muted hover:bg-macro-hover">
+                    <span>📈</span>
+                    <span class="text-sm font-medium">S1信号</span>
+                </div>
+                <div class="mb-1">
+                    <!-- 父菜单（带展开图标） -->
+                    <div id="ratesParent"
+                        class="flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-macro-muted hover:bg-macro-hover">
+                        <div class="flex items-center gap-3">
+                            <span>💰</span>
+                            <span class="text-sm font-medium">利率观测</span>
+                        </div>
+                        <span id="ratesArrow" class="text-xs transition-transform">➤</span>
+                    </div>
+
+                    <!-- 子菜单（初始隐藏） -->
+                    <div id="ratesSubmenu" class="ml-6 mt-1 space-y-1 hidden">
+                        <div id="navRatesOverview"
+                            class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer text-macro-muted hover:bg-macro-hover">
+                            <span>📊</span>
+                            <span class="text-sm">利率概览</span>
+                        </div>
+                        <div id="navYieldCurve"
+                            class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer text-macro-muted hover:bg-macro-hover">
+                            <span>📈</span>
+                            <span class="text-sm">收益率曲线</span>
+                        </div>
+                        <div id="navFedWatch"
+                            class="nav-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer text-macro-muted hover:bg-macro-hover">
+                            <span>🏦</span>
+                            <span class="text-sm">美联储观察</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-[10px] text-macro-muted/60 mt-6 px-3">✅ 点击切换板块 · 局部刷新</div>
+            </nav>
+
+
+            <div class="p-4 border-t border-macro-border text-[10px] text-macro-muted space-y-1">
+                <div>🎨 技术: Google Fonts / Tailwind / ECharts</div>
+                <div id="dateLabel" class="text-sm font-mono text-green-400 text-center mt-2">2026-05-24</div>
+            </div>
+        </aside>
+
+        <!-- ========= 右侧主内容区 ========= -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部栏 -->
+            <div
+                class="flex-shrink-0 bg-[#0c0e14] border-b border-macro-border px-5 py-3 flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-macro-muted">🗓️</span>
+                    <span id="dateLabel" class="text-sm font-mono text-macro-text text-green-400">2026-05-24 ·
+                        模拟数据</span>
+                </div>
+                <div class="flex items-center gap-5">
+                    <div class="flex gap-4 text-xs">
+                        <div><span class="text-macro-muted">WTI原油:</span> <span id="quickWti"
+                                class="text-macro-gold font-semibold">--</span></div>
+                        <div><span class="text-macro-muted">标普500:</span> <span id="quickSpx"
+                                class="text-white font-semibold">--</span></div>
+                        <div><span class="text-macro-muted">10Y收益率:</span> <span id="quickTn"
+                                class="text-white font-semibold">--</span></div>
+                    </div>
+                    <button id="refreshBtn"
+                        class="bg-[#1f2538] hover:bg-[#2d354c] px-3 py-1.5 rounded-full text-xs transition flex items-center gap-1">
+                        🔄 刷新数据
+                    </button>
+                </div>
+            </div>
+
+            <!-- 动态内容容器 (局部刷新) -->
+            <div class="flex-1 overflow-y-auto p-5" id="dynamicPanel">
+                <div class="flex justify-center items-center h-40 text-macro-muted">加载中...</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/updateTime.js"></script>
+    <script src="js/FearGreedIndex.js"></script>
+    <script src="js/renderDashboard.js"></script>
+    <script src="js/renderS1.js"></script>
+    <script src="js/renderRates.js"></script>
+    <script src="js/FRED.js"></script>
+    <script src="js/dataS1.js"></script>
+    <script src="js/macroData.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/refresh.js"></script>
+    <script>
+        async function init() {
+            bindEvents();
+
+            // 默认激活 dashboard 板块
+            activeView = 'dashboard';
+
+            // 预先加载股票数据（可选）
+            currentStockData = await fetchStockData();
+
+            // 高亮设置
+            const navDashboard = document.getElementById('navDashboard');
+            const navStock = document.getElementById('navStockBoard');
+
+            if (navDashboard) {
+                navDashboard.classList.add('bg-macro-active', 'text-white');
+                navDashboard.classList.remove('text-macro-muted');
+            }
+            if (navStock) {
+                navStock.classList.remove('bg-macro-active', 'text-white');
+                navStock.classList.add('text-macro-muted');
+            }
+
+            await updateTopBar();
+            await refreshCurrentView();
+
+            // 启动时间刷新
+            startTimeUpdater();
+        }
+        init();
+    </script>
+</body>
+
+</html>
