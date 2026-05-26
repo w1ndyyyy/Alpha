@@ -1,5 +1,6 @@
 // 渲染函数 (市场总览板块)
 function renderDashboardHTML(data) {
+    const vixHistory = data.vixHistory;
     return `
             <div class="fade-in space-y-5">
                 <!-- 第一行：恐慌贪婪指数占较窄宽度，右边放其他模块 -->
@@ -31,7 +32,8 @@ function renderDashboardHTML(data) {
                         </div>
                     </div>
                 </div>
-
+                <!-- 第二行：VIX 历史走势图 -->
+                ${vixHistory ? renderVIXHistoryChart(vixHistory) : ''}
                 <div class="bg-macro-card rounded-2xl border border-macro-border p-5 shadow-lg glowing-card">
                     <div class="flex justify-between items-center border-b border-macro-border pb-3 mb-3">
                         <h2 class="text-lg font-semibold text-white">📌 MACRO STATE · 宏观状态</h2>

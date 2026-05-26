@@ -76,7 +76,10 @@ async function fetchMacroData() {
         vixLabel = '极度平静';
         vixColor = 'text-blue-400';
     }
-    console.log('vixColor:', vixColor); // 调试日志
+
+    // 获取 VIX 历史数据
+    const vixHistory = await fetchVIXHistory(365);
+    console.log('vixHistory:', vixHistory); // 调试日志
 
     return {
         wti: newWti,
@@ -136,6 +139,7 @@ async function fetchMacroData() {
         vixDate: ratesData.vixDate || '--',
         vixLabel: vixLabel,
         vixColor: vixColor,
+        vixHistory: vixHistory,
     };
 }
 

@@ -87,13 +87,13 @@ async function manualRefresh() {
         const macro = await fetchMacroData(true); // 强制刷新
         const fearGreed = await fetchFearGreedData(true);
         dashboardData = { ...macro, ...fearGreed };
-    } 
+    }
     else if (activeView === 'ratesOverview') {
         // 清除缓存，强制刷新利率数据
         ratesCache = null;
         ratesData = await fetchRatesData();
     }
-    
+
     await refreshCurrentView();
 }
 
