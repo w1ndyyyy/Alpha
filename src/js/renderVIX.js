@@ -65,7 +65,7 @@ function renderVIXHistoryChart(vixHistory) {
                     // 阈值线放在 series 里面
                     markLine: {
                         data: [
-                            { yAxis: 20, name: '恐慌阈值', lineStyle: { color: '#f97316', width: 1, type: 'dashed' }, label: { color: '#f97316', show: true, formatter: '{b}', position: 'end' }},
+                            { yAxis: 20, name: '恐慌', lineStyle: { color: '#f97316', width: 1, type: 'dashed' }, label: { color: '#f97316', show: true, formatter: '{b}', position: 'end' }},
                             { yAxis: 30, name: '极度恐慌', lineStyle: { color: '#ef4444', width: 1, type: 'dashed' }, label: { color: '#ef4444', show: true, formatter: '{b}', position: 'end' }}
                         ],
                         label: { show: true, formatter: '{b}', color: '#eef2ff', fontSize: 10, position: 'end' },
